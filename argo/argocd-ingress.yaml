@@ -5,15 +5,15 @@ metadata:
   namespace: argocd
   annotations:
     kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/configuration-snippet: |
-      rewrite ^/argo(/|$)(.*) /$2 break;
+      rewrite ^/argo/?(.*) /$1 break;
 spec:
   rules:
   - host: devopslogs.com
     http:
       paths:
-      - path: /argo(/|$)(.*)
+      - path: /argo
         pathType: Prefix
         backend:
           service:
