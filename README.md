@@ -1,40 +1,103 @@
-Perfect 👍 — let’s add a clean **index (table of contents)** at the top of your `README.md` so anyone can easily navigate it.
+You're right—I missed the **ingress-nginx Helm repo add + install + uninstall** steps. Here's the **updated README** with the ingress bits added in the right places (and keeping your exact app manifest path):
 
-Here’s the updated README with an **index** included:
+````markdown
+# 🚀 Infrastructure & Application Setup on AWS EKS
+
+This guide walks through:
+1) Provisioning infra with **Terraform**
+2) Configuring **AWS CLI** and connecting to EKS
+3) Installing **Helm**
+4) Installing **AWS EBS CSI Driver** (dynamic EBS volumes)
+5) Installing **ingress-nginx** (Helm)
+6) Installing **Argo CD** (Helm)
+7) Deploying the **Java Web App** (Argo CD Application manifest)
+8) Setting up **Route 53** with the Load Balancer
 
 ---
-
-# 🚀 Kubernetes Platform Setup with ArgoCD & Ingress-NGINX
 
 ## 📑 Index
-
-1. [Install](#-install)
-
-   * [Add Repos](#add-repos-only-once)
-   * [Install ingress-nginx](#install-ingress-nginx-using-your-plateformyaml)
-   * [Install ArgoCD](#install-argo-cd-using-your-install-argo-cd-helm-valueyaml)
-2. [Uninstall](#%EF%B8%8F-uninstall)
-3. [Application Deployment](#-application-deployment)
-4. [Infrastructure Setup (EKS with Terraform)](#-infrastructure-setup-eks-with-terraform)
-5. [Architecture](#-architecture)
-
-   * [Infra Text Diagram](#infra-text-based-diagram)
-   * [Application Infra](#application-infra-in-eks)
-   * [Cluster Application Architecture](#application-architecture-in-cluster)
+1. [Terraform Infrastructure Setup](#1-terraform-infrastructure-setup)
+2. [AWS CLI Configuration & EKS Access](#2-aws-cli-configuration--eks-access)
+3. [Install Helm](#3-install-helm)
+4. [Install AWS EBS CSI Driver](#4-install-aws-ebs-csi-driver)
+5. [Install ingress-nginx (Helm)](#5-install-ingress-nginx-helm)
+6. [Install Argo CD (Helm)](#6-install-argo-cd-helm)
+7. [Deploy Web Application (Argo CD)](#7-deploy-web-application-argo-cd)
+8. [Route 53 & Load Balancer Setup](#8-route-53--load-balancer-setup)
+9. [Uninstall / Cleanup](#9-uninstall--cleanup)
 
 ---
 
-## 🚀 Install
+## 1) Terraform Infrastructure Setup
+```bash
+cd eks/
+terraform init
+terraform plan
+terraform apply -auto-approve
+````
 
-### Add repos (only once)
+---
+
+## 2) AWS CLI Configuration & EKS Access
+
+```bash
+aws configure
+aws eks --region <your-region> update-kubeconfig --name <your-cluster-name>
+kubectl get nodes
+```
+
+---
+
+## 3) Install Helm
+
+```bash
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+```
+
+---
+
+## 4) Install AWS EBS CSI Driver
+
+Create secret (using your AWS access key & secret key):
+
+```bash
+kubectl create secret generic aws-secret \
+  --namespace kube-system \
+  --from-literal "key_id=${AWS_ACCESS_KEY_ID}" \
+  --from-literal "access_key=${AWS_SECRET_ACCESS_KEY}"
+```
+
+Add repo & install:
+
+```bash
+helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
+helm repo update
+
+helm upgrade --install aws-ebs-csi-driver \
+  --namespace kube-system \
+  aws-ebs-csi-driver/aws-ebs-csi-driver
+```
+
+Verify:
+
+```bash
+kubectl get pods -n kube-system -l app.kubernetes.io/name=aws-ebs-csi-driver
+```
+
+---
+
+## 5) Install ingress-nginx (Helm)
+
+Add repo (only once):
 
 ```bash
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-helm repo add argo https://argoproj.github.io/argo-helm
 helm repo update
 ```
 
-### Install ingress-nginx (using your plateform.yaml)
+Install with your values file:
 
 ```bash
 helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
@@ -42,101 +105,101 @@ helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
   -f platform/ingress-nginx/values.yaml
 ```
 
-### Install argo-cd (using your install-argo-cd-helm-value.yaml)
+Check service / external LB:
 
 ```bash
-kubectl apply -f argo/argocd-namespace.yaml
-helm upgrade --install argocd argo/argo-cd -n argocd -f argo/install-argocd-helm-values.yaml
+kubectl get svc -n ingress-nginx
 ```
 
-Post Argo CD install:
+---
+
+## 6) Install Argo CD (Helm)
 
 ```bash
-kubectl get ingress -A
+kubectl create namespace argocd
+
+helm repo add argo https://argoproj.github.io/argo-helm
+helm repo update
+
+helm upgrade --install argocd argo/argo-cd -n argocd \
+  -f argo/install-argocd-helm-values.yaml
+```
+
+ Apply Argo CD ingress:
+
+```bash
 kubectl apply -f argo/argocd-ingress.yaml
-helm upgrade argocd argo/argo-cd -n argocd -f argo/install-argocd-helm-values.yaml
+kubectl get ingress -A
 ```
 
----
-
-## 🗑️ Uninstall
+Get initial admin password:
 
 ```bash
-helm uninstall argocd -n argocd
-helm uninstall ingress-nginx -n ingress-nginx
-kubectl delete ns argocd ingress-nginx --ignore-not-found
+kubectl -n argocd get secret argocd-initial-admin-secret \
+  -o jsonpath="{.data.password}" | base64 -d && echo
 ```
-
-✅ With this setup:
-
-* `ingress-nginx` → namespace `ingress-nginx`
-* `argocd` → namespace `argocd`
-* Both use your provided values files.
 
 ---
 
-## 📦 Application Deployment
+## 7) Deploy Web Application (Argo CD)
 
-To deploy your **Java Web App** via ArgoCD:
+Use your **exact** Application manifest:
 
 ```bash
 kubectl apply -f argo/argocd-apps/java-app-app.yaml -n argocd
 ```
 
----
-
-## 🏗️ Infrastructure Setup (EKS with Terraform)
-
-1. Go to the `eks/` folder.
-2. Replace your AWS `access_key` and `secret_key` in `terraform.tfvars` (or env variables).
-3. Run:
-
-   ```bash
-   terraform init
-   terraform apply -auto-approve
-   ```
-4. Once cluster is ready, update kubeconfig:
-
-   ```bash
-   aws eks update-kubeconfig --region <your-region> --name <cluster-name>
-   ```
+Argo CD will reconcile the app defined in `charts/java-webapp`.
 
 ---
 
-## 🏛️ Architecture
+## 8) Route 53 & Load Balancer Setup
 
-### Infra Text Based Diagram
+Get the LoadBalancer DNS (from ingress-nginx or your app’s Service/Ingress):
 
-```
-AWS Account
-   └── VPC
-       ├── Public Subnets
-       │    └── Internet Gateway
-       ├── Private Subnets
-       │    └── NAT Gateway
-       └── EKS Cluster
-            ├── Node Group(s)
-            ├── ingress-nginx (Namespace: ingress-nginx)
-            └── argocd (Namespace: argocd)
+```bash
+kubectl get svc -n ingress-nginx
+kubectl get svc -n apps
+kubectl get ingress -A
 ```
 
-### Application Infra in EKS
+Create/Update a **Route 53** record:
 
-```
-EKS Cluster
-   ├── ingress-nginx Controller
-   ├── ArgoCD
-   │    └── Manages deployments
-   └── Java Web App (via ArgoCD Application CR)
-```
-
-### Application Architecture in Cluster
-
-```
-[User] --> [Route53 DNS: A/CNAME Record] --> [AWS Load Balancer]
-    --> [Ingress NGINX Controller] --> [ArgoCD-managed App Services]
-```
+* **A (Alias)** or **CNAME** → point to the LoadBalancer DNS, e.g.
+  `devopslogs.com → k8s-xxxxxxxx.elb.amazonaws.com`
 
 ---
 
-Would you like me to also add **screenshots placeholders** (like `![diagram](./images/eks-arch.png)`) so you or your team can later drop actual diagrams, or you want to keep it text-based only?
+## 9) Uninstall / Cleanup
+
+Uninstall Argo CD:
+
+```bash
+helm uninstall argocd -n argocd
+kubectl delete ns argocd --ignore-not-found
+```
+
+Uninstall ingress-nginx:
+
+```bash
+helm uninstall ingress-nginx -n ingress-nginx
+kubectl delete ns ingress-nginx --ignore-not-found
+```
+
+(Optional) Uninstall EBS CSI Driver:
+
+```bash
+helm uninstall aws-ebs-csi-driver -n kube-system
+```
+
+Tear down infra (if desired):
+
+```bash
+cd eks/
+terraform destroy -auto-approve
+```
+
+```
+
+Want me to drop this straight into a `README.md` file in your repo (and also add a tiny **verify** section showing sample `kubectl` outputs)?
+```
