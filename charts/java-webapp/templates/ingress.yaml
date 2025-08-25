@@ -5,16 +5,15 @@ metadata:
   namespace: {{ .Values.namespace }}
   annotations:
     kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   rules:
     - host: {{ .Values.ingress.host }}
       http:
         paths:
-          - path: /java-test(/|$)(.*)
+          - path: /java-test
             pathType: Prefix
             backend:
               service:
-                name: frontend-svc       # 👈 matches your Service name
+                name: frontend-svc
                 port:
-                  number: 8080           # 👈 match frontend container/service port
+                  number: 8080
