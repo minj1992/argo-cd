@@ -5,14 +5,17 @@ metadata:
   namespace: argocd
   annotations:
     kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"  # disables auto HTTP → HTTPS redirect
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"   # temporary for testing
 spec:
   rules:
   - host: devopslogs.com
     http:
       paths:
-      - path: /argo
-        pathType: Prefix
+      - path: /argo(/|$)(.*)
+        pathType: ImplementationSpecific
         backend:
           service:
             name: argocd-server
