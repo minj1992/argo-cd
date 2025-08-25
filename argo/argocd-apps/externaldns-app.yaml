@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: externaldns
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://kubernetes-sigs.github.io/external-dns/
+    chart: external-dns
+    targetRevision: 1.15.0
+  helm:
+    values: |
+      provider: aws
+      policy: upsert-only
+      registry: txt
+      txtOwnerId: eks-devopslogs
+      domainFilters:
+        - devopslogs.com
+      serviceAccount:
+        annotations: {}
+      sources:
+        - ingress
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: externaldns
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+  syncOptions:
+    - CreateNamespace=true

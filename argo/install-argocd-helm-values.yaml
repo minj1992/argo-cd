@@ -1,0 +1,27 @@
+global:
+domain: devopslogs.com
+
+
+configs:
+params:
+server.insecure: true # HTTP only (port 80). Use HTTPS in prod.
+
+
+cm:
+# Base href and rootpath make Argo CD UI work at /argo
+server.basehref: /argo
+server.rootpath: /argo
+
+
+server:
+ingress:
+enabled: true
+ingressClassName: nginx
+paths:
+- /argo
+# No TLS for now; add tls block if you enable cert-manager
+annotations:
+nginx.ingress.kubernetes.io/rewrite-target: /$1
+nginx.ingress.kubernetes.io/use-regex: "true"
+extraArgs:
+- --insecure

@@ -1,0 +1,24 @@
+namespace: apps
+
+image:
+  frontend: 180294213274.dkr.ecr.us-east-1.amazonaws.com/app001-dev:frontend1.1.0
+  mysql: 180294213274.dkr.ecr.us-east-1.amazonaws.com/app001-dev:backend1.1.0
+
+mysql:
+  rootPassword: "Login%12345" # will be stored in Secret
+  database: db1
+  serviceName: mysql-service1
+  storage:
+    size: 5Gi
+
+ingress:
+  host: devopslogs.com
+
+# If your app needs to know it runs under /java-test
+app:
+  contextPath: /java-test
+  db:
+    host: mysql-service1
+    port: "3306"
+    name: db1
+    user: root
