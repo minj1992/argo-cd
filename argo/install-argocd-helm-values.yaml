@@ -8,12 +8,16 @@ server:
     hosts:
       - devopslogs.com
     paths:
-      - /argo          # ArgoCD path
-    pathType: Prefix
+      - /argo(/|$)(.*)           # match /argo and subpaths
+    pathType: ImplementationSpecific
     extraAnnotations:
       nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-      # Do NOT use rewrite-target here
+      nginx.ingress.kubernetes.io/rewrite-target: /$2  # strip /argo before sending to ArgoCD
+      nginx.ingress.kubernetes.io/use-regex: "true"
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"  # optional, helpful for testing HTTP first
+      kubernetes.io/ingress.class: nginx
 
 configs:
   params:
-    server.basehref: /argo  # IMPORTANT: tells ArgoCD it runs under /argo
+    server.basehref: /argo   # tells ArgoCD it is served under /argo
+    server.rootpath: ""      # keep empty

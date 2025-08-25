@@ -9,13 +9,13 @@ spec:
     repoURL: https://github.com/minj1992/argo-cd.git
     targetRevision: HEAD
     path: charts/java-webapp
-  helm:
-    values: |
-      image:
-        frontend: 180294213274.dkr.ecr.us-east-1.amazonaws.com/app001-dev:frontend1.1.0
-        mysql: 180294213274.dkr.ecr.us-east-1.amazonaws.com/app001-dev:backend1.1.0
-      ingress:
-        host: devopslogs.com
+    helm:                      # 👈 moved under source
+      values: |
+        image:
+          frontend: 180294213274.dkr.ecr.us-east-1.amazonaws.com/app001-dev:frontend1.1.0
+          mysql: 180294213274.dkr.ecr.us-east-1.amazonaws.com/app001-dev:backend1.1.0
+        ingress:
+          host: devopslogs.com
   destination:
     server: https://kubernetes.default.svc
     namespace: apps
@@ -23,5 +23,5 @@ spec:
     automated:
       prune: true
       selfHeal: true
-  syncOptions:
-    - CreateNamespace=true
+    syncOptions:               # 👈 moved under syncPolicy
+      - CreateNamespace=true
