@@ -1,21 +1,19 @@
-global:
-  image:
-    tag: v2.11.0 # pick the version you want
-
 server:
   ingress:
     enabled: true
     ingressClassName: nginx
-    hosts:
-      - devopslogs.com
-    paths:
-      - /argo
-    pathType: Prefix
-    https: false
     annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
       nginx.ingress.kubernetes.io/rewrite-target: /$2
-      nginx.ingress.kubernetes.io/proxy-body-size: 0
-      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
-      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
-      nginx.ingress.kubernetes.io/configuration-snippet: |
-        rewrite ^/argo(/|$)(.*) /$2 break;  
+    hosts:
+      - host: devopslogs.com
+        paths:
+          - path: /argo(/|$)(.*)
+            pathType: ImplementationSpecific
+    tls: [] # Add cert-manager or ACM if you want TLS automation
+
+  # Critical for UI path
+  extraArgs:
+    - --basehref
+    - /argo

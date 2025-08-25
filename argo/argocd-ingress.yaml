@@ -5,14 +5,14 @@ metadata:
   namespace: argocd
   annotations:
     kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
 spec:
   rules:
   - host: devopslogs.com
     http:
       paths:
-      - path: /argo(/|$)(.*)
-        pathType: ImplementationSpecific
+      - path: /argo
+        pathType: Prefix
         backend:
           service:
             name: argocd-server
