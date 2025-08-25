@@ -1,4 +1,4 @@
-<img width="959" height="459" alt="00-argo" src="https://github.com/user-attachments/assets/4fb4c4fa-f574-4227-8266-ab664db34ecc" />You're right—I missed the **ingress-nginx Helm repo add + install + uninstall** steps. Here's the **updated README** with the ingress bits added in the right places (and keeping your exact app manifest path):
+
 
 ````markdown
 # 🚀 Infrastructure & Application Setup on AWS EKS
