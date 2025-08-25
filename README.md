@@ -201,9 +201,12 @@ terraform destroy -auto-approve
 <img width="959" height="459" alt="00-argo" src="https://github.com/user-attachments/assets/1def4be3-60d4-4447-8c05-75ea809b510e" />
 
 
+
+<img width="519" height="485" alt="001-argo" src="https://github.com/user-attachments/assets/bfe6b7a0-005a-44a6-8aac-874c652dd47c" />
+
 <img width="910" height="479" alt="002-argo" src="https://github.com/user-attachments/assets/53a99f0a-03c5-4473-8810-d761fc58e0ec" />
 
-<img width="936" height="392" alt="003-argo" src="https://github.com/user-attachments/assets/e0e62204-fc6d-464d-b0a6-35b1c8a4620a" /><img width="936" height="392" alt="003-argo" src="https://github.com/user-attachments/assets/8bf2acf4-0ed0-451a-a9aa-095829f7b267" />
+<img width="936" height="392" alt="003-argo" src="https://github.com/user-attachments/assets/e0e62204-fc6d-464d-b0a6-35b1c8a4620a" />
 
 
 
