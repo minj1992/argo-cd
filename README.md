@@ -201,5 +201,3 @@ terraform destroy -auto-approve
 
 ```
 
-Want me to drop this straight into a `README.md` file in your repo (and also add a tiny **verify** section showing sample `kubectl` outputs)?
-```
