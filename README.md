@@ -1,4 +1,4 @@
-You're right—I missed the **ingress-nginx Helm repo add + install + uninstall** steps. Here's the **updated README** with the ingress bits added in the right places (and keeping your exact app manifest path):
+<img width="959" height="459" alt="00-argo" src="https://github.com/user-attachments/assets/4fb4c4fa-f574-4227-8266-ab664db34ecc" />You're right—I missed the **ingress-nginx Helm repo add + install + uninstall** steps. Here's the **updated README** with the ingress bits added in the right places (and keeping your exact app manifest path):
 
 ````markdown
 # 🚀 Infrastructure & Application Setup on AWS EKS
@@ -198,6 +198,14 @@ Tear down infra (if desired):
 cd eks/
 terraform destroy -auto-approve
 ```
+<img width="959" height="459" alt="00-argo" src="https://github.com/user-attachments/assets/1def4be3-60d4-4447-8c05-75ea809b510e" />
+
+
+<img width="910" height="479" alt="002-argo" src="https://github.com/user-attachments/assets/53a99f0a-03c5-4473-8810-d761fc58e0ec" />
+
+<img width="936" height="392" alt="003-argo" src="https://github.com/user-attachments/assets/e0e62204-fc6d-464d-b0a6-35b1c8a4620a" /><img width="936" height="392" alt="003-argo" src="https://github.com/user-attachments/assets/8bf2acf4-0ed0-451a-a9aa-095829f7b267" />
+
+
 
 ```
 
