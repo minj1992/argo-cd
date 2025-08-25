@@ -12,19 +12,10 @@ spec:
     - host: {{ .Values.ingress.host }}
       http:
         paths:
-          # Argo CD at /argo (served by argocd-server in argocd ns)
-          - path: /argo(.*)
-            pathType: Prefix
-            backend:
-              service:
-                name: argocd-server
-                port:
-                  number: 80
-          # App at /java-test
           - path: /java-test(.*)
             pathType: Prefix
             backend:
               service:
-                name: frontend-service
+                name: frontend-service    # 👈 matches fixed service
                 port:
                   number: 80

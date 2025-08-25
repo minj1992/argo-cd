@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-name: mysql-pvc
-namespace: {{ .Values.namespace }}
+  name: mysql-pvc
+  namespace: {{ .Values.namespace }}
 spec:
-accessModes:
-- ReadWriteOnce
-storageClassName: ebs-sc-dynamic
-resources:
-requests:
-storage: {{ .Values.mysql.storage.size }}
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ebs-sc-dynamic
+  resources:
+    requests:
+      storage: {{ .Values.mysql.storage.size }}
